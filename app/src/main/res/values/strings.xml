@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="tipo_marcacao">Tipo de local</string>
+    <string name="bom">Bom</string>
+    <string name="ruim">Ruim</string>
+    <string name="ok">Ok</string>
+    <string name="cancelar">Cancelar</string>
+</resources>
