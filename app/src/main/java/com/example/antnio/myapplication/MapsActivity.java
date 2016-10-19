@@ -92,26 +92,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     int resultCode, Intent data) {
                                     super.onActivityResult(requestCode, resultCode, data);
 
-        Bundle bundle = getIntent().getExtras();
-
-        if(bundle != null) {
-            if (bundle.containsKey("MARCAR")) {
-                boolean confirma = bundle.getBoolean("MARCAR");
-                if (bundle.containsKey("Classificacao") && marcar && confirma) {
-                    String tipo = bundle.getString("Classificacao");
-                    mMap.addMarker(new MarkerOptions().position(latLngMarcar).title(tipo));
-                    marcar = false;
-                }
-            }
-        }
-
-        if(bundle == null) {
             if (resultCode == 0) {
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM"));
             } else if (resultCode == 1) {
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
             }
-        }
     }
 
     @Override
@@ -125,10 +110,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {   marcar = true;
             latLngMarcar = point;
             it.putExtra("TESTE", "teste aqui"); // trecho apenas para um teste de passagem dos parametros
-            startActivityForResult(it, 0);
-            } }); //chama a outra janela
+            startActivityForResult(it, 0); } }); //chama a outra janela
 
-        Bundle bundle = getIntent().getExtras();
+        /*Bundle bundle = getIntent().getExtras();
 
         if(bundle != null) {
             if (bundle.containsKey("MARCAR")) {
@@ -139,7 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     marcar = false;
                 }
             }
-        }
+        }*/
 
         /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener()
         { @Override public void onMapLongClick(LatLng point)
