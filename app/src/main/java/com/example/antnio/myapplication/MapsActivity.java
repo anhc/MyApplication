@@ -1,6 +1,7 @@
 package com.example.antnio.myapplication;
 
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -19,6 +20,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.location.Address;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -30,6 +35,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Intent it;
     boolean marcar = false;
     LatLng latLngMarcar;
+    EditText edtProcurar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+        }
+    }
+
+    public void procurarLocal(View view) {
+        edtProcurar = (EditText)findViewById(R.id.edtProcurar);
+        String location = edtProcurar.getText().toString();
+        List<Address> locaisList = null;
+        if(location != null && !location.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                locaisList = geocoder.getFromLocationName(location, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Address address = locaisList.get(0);
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         }
     }
 
