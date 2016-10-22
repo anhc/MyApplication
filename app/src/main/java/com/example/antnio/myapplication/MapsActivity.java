@@ -18,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
@@ -92,9 +93,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     int resultCode, Intent data) {
                                     super.onActivityResult(requestCode, resultCode, data);
 
-            if (resultCode == 0) {
-                mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM"));
-            } else if (resultCode == 1) {
+            if (resultCode == 1) {
+                mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            } else if (resultCode == 2) {
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
             }
     }

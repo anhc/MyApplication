@@ -10,7 +10,7 @@ import android.content.*;
 
 public class ActTelaParaMarcar extends AppCompatActivity implements View.OnClickListener {
 
-    String classificacao;
+    String classificacao = "vazio";
     private Button btnOk, btnCancelar;
     private TextView teste;
     Intent it;
@@ -39,21 +39,21 @@ public class ActTelaParaMarcar extends AppCompatActivity implements View.OnClick
         it = new Intent(this, MapsActivity.class);
         switch (v.getId()){
             case R.id.btnOk:
-                if(it!=null) {
+                if(it!=null && !classificacao.equals("vazio")) {
                     it.putExtra("Classificacao", classificacao);
-                    it.putExtra("MARCAR", true);
+                    //it.putExtra("MARCAR", true);
 
                     if(classificacao.equals("Bom"))
-                        setResult(0);
-                    else
                         setResult(1);
+                    else
+                        setResult(2);
                     finish();
                 }
                 break;
             case R.id.btnCancelar:
                 if(it!=null) {
-                    it.putExtra("MARCAR", false);
-                    setResult(2);
+                    //it.putExtra("MARCAR", false);
+                    setResult(3);
                     finish();
                 }
                 break;
