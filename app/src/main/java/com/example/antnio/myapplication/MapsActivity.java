@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import  android.view.*;
 import android.content.*;
@@ -71,9 +72,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 e.printStackTrace();
             }
 
-            Address address = locaisList.get(0);
+            Address address;
+            try {
+                address = locaisList.get(0);
+            } catch (IndexOutOfBoundsException e) {
+                Context context = getApplicationContext();
+                CharSequence text = "Local digitado não existe!";
+                int duration = Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+
+                InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
+                        INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+                return;
+            }
+
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+
+            InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
+                    INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 
@@ -91,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode, Intent data) {
-                                    super.onActivityResult(requestCode, resultCode, data);
+            super.onActivityResult(requestCode, resultCode, data);
 
             if (resultCode == 1) {
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
