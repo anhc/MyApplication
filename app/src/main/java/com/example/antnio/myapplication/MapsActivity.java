@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SearchView.OnQueryTextListener {
 
     private GoogleMap mMap;
     private static final int MY_PERMISSION_LOCATION = 0;
@@ -38,6 +38,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean marcar = false;
     LatLng latLngMarcar;
     EditText edtProcurar;
+    SearchView barraProcurar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addApi(LocationServices.API)
                     .build();
         }
+
+        barraProcurar = (SearchView) findViewById(R.id.barraProcurar);
+        barraProcurar.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        //está aqui porque implementou SearchView.OnQueryTextListener
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        List<Address> locaisList = null;
+        if(query != null && !query.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                locaisList = geocoder.getFromLocationName(query, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Address address;
+            try {
+                address = locaisList.get(0);
+            } catch (IndexOutOfBoundsException e) {
+                Context context = getApplicationContext();
+                CharSequence text = "Local digitado não existe!";
+                int duration = Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+
+                InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
+                        INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+                return false;
+            }
+
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+
+            InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
+                    INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
+        return false;
     }
 
     public void procurarLocal(View view) {
