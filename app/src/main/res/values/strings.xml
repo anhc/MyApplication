@@ -7,5 +7,5 @@
     <string name="ok">Ok</string>
     <string name="cancelar">Cancelar</string>
     <string name="procurar">Procurar</string>
-    <string name="digiteLocal">Digite o nome de um local</string>
+    <string name="digiteLocal">Digite um local</string>
 </resources>

@@ -1,12 +1,14 @@
 package com.example.antnio.myapplication;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import  android.view.*;
@@ -20,6 +22,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
@@ -28,17 +32,20 @@ import java.io.IOException;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SearchView.OnQueryTextListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SearchView.OnQueryTextListener,
+        GoogleMap.OnCircleClickListener{
 
     private GoogleMap mMap;
+    private Boolean inicio = true;
     private static final int MY_PERMISSION_LOCATION = 0;
     GoogleApiClient mGoogleApiClient = null;
-    Location mLastLocation = null;
+    Location inicialLocation = null;
     Intent it;
     boolean marcar = false;
     LatLng latLngMarcar;
     EditText edtProcurar;
     SearchView barraProcurar;
+    Circle circulo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,9 +177,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (resultCode == 1) {
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                circulo = mMap.addCircle(new CircleOptions()
+                        .center(latLngMarcar)
+                        .radius(300)
+                        .strokeWidth(2)
+                        .strokeColor(0xff4682B4)
+                        .fillColor(0x504682B4)
+                        .clickable(true));
             } else if (resultCode == 2) {
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
             }
+    }
+
+    public void onCircleClick(Circle circle) {
+        circulo.setFillColor(0x50008000);
     }
 
     @Override
@@ -215,7 +233,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
-            onConnected(Bundle.EMPTY);
+            if(inicio)
+                onConnected(Bundle.EMPTY);
         } else {
             // Show rationale and request permission.
             ActivityCompat.requestPermissions(this,
@@ -244,16 +263,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // We tried to connect but failed!
     }
 
-    public void onConnected(Bundle connectionHint) { // adiciona um marcador na posicao inicial
-        /*if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+    public void onConnected(Bundle connectionHint) { // passa a posicao inicial
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+            inicialLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-            if (mLastLocation != null) {
-                LatLng lugar = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(lugar).title("Estou aqui!!"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(lugar));
+            if (inicialLocation != null) {
+                LatLng lugar = new LatLng(inicialLocation.getLatitude(), inicialLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lugar, 14));
+
+                Geocoder geocoder = new Geocoder(this);
+                List<Address> address = null;
+                try {
+                    address = geocoder.getFromLocation(inicialLocation.getLatitude(), inicialLocation.getLongitude(), 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String cidade = address.get(0).getLocality();
+                String bairro = address.get(0).getSubLocality();
+
+                Log.e( "XWXW", " " + cidade);
+                Log.e( "QMQM", " " + bairro);
             }
-        }*/
+        }
+        inicio = false;
     }
 }
