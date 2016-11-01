@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
 
@@ -175,6 +176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             super.onActivityResult(requestCode, resultCode, data);
 
             if (resultCode == 1) {
+                Marker marcador =
                 mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 circulo = mMap.addCircle(new CircleOptions()
@@ -191,6 +193,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void onCircleClick(Circle circle) {
         circulo.setFillColor(0x50008000);
+        Log.e( "XWXW", " " + "CLICK CIRCLE");
     }
 
     @Override
@@ -233,8 +236,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
-            if(inicio)
+            if(inicio){
                 onConnected(Bundle.EMPTY);
+            }
         } else {
             // Show rationale and request permission.
             ActivityCompat.requestPermissions(this,
@@ -264,8 +268,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onConnected(Bundle connectionHint) { // passa a posicao inicial
+        Log.e( "EXECUTANDO", " onConnected");
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED && inicio) {
             inicialLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
             if (inicialLocation != null) {
@@ -282,10 +287,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String cidade = address.get(0).getLocality();
                 String bairro = address.get(0).getSubLocality();
 
-                Log.e( "XWXW", " " + cidade);
-                Log.e( "QMQM", " " + bairro);
+                Log.e( "CIDADE", " " + cidade);
+                Log.e( "BAIRRO", " " + bairro);
+                inicio = false;
             }
         }
-        inicio = false;
     }
 }
