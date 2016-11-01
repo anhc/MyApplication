@@ -1,9 +1,12 @@
 package com.example.antnio.myapplication;
 
+import android.*;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -14,6 +17,9 @@ import android.widget.*;
 import  android.view.*;
 import android.content.*;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -30,11 +36,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SearchView.OnQueryTextListener,
-        GoogleMap.OnCircleClickListener{
+        GoogleMap.OnCircleClickListener {
 
     private GoogleMap mMap;
     private Boolean inicio = true;
@@ -47,6 +58,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     EditText edtProcurar;
     SearchView barraProcurar;
     Circle circulo;
+    Calendar hora;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         ActivityCompat.requestPermissions(this,
-                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 MY_PERMISSION_LOCATION);
 
         if (mGoogleApiClient == null) {
@@ -70,6 +87,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         barraProcurar = (SearchView) findViewById(R.id.barraProcurar);
         barraProcurar.setOnQueryTextListener(this);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        //hora = Calendar.getInstance();
     }
 
     @Override
@@ -81,7 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onQueryTextSubmit(String query) {
         List<Address> locaisList = null;
-        if(query != null && !query.equals("")) {
+        if (query != null && !query.equals("")) {
             Geocoder geocoder = new Geocoder(this);
             try {
                 locaisList = geocoder.getFromLocationName(query, 1);
@@ -120,10 +142,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void procurarLocal(View view) {
-        edtProcurar = (EditText)findViewById(R.id.edtProcurar);
+        edtProcurar = (EditText) findViewById(R.id.edtProcurar);
         String location = edtProcurar.getText().toString();
         List<Address> locaisList = null;
-        if(location != null && !location.equals("")) {
+        if (location != null && !location.equals("")) {
             Geocoder geocoder = new Geocoder(this);
             try {
                 locaisList = geocoder.getFromLocationName(location, 1);
@@ -173,27 +195,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
 
-            if (resultCode == 1) {
-                Marker marcador =
-                mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                circulo = mMap.addCircle(new CircleOptions()
-                        .center(latLngMarcar)
-                        .radius(300)
-                        .strokeWidth(2)
-                        .strokeColor(0xff4682B4)
-                        .fillColor(0x504682B4)
-                        .clickable(true));
-            } else if (resultCode == 2) {
-                mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
-            }
+        if (resultCode == 1) {
+            String lat = ""+latLngMarcar.latitude;
+            Log.e("LATITUDE", lat);
+            String slong = ""+latLngMarcar.longitude;
+            Log.e("LATITUDE", slong);
+            mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            circulo = mMap.addCircle(new CircleOptions()
+                    .center(latLngMarcar)
+                    .radius(300)
+                    .strokeWidth(2)
+                    .strokeColor(0xff4682B4)
+                    .fillColor(0x504682B4)
+                    .clickable(true));
+            hora = Calendar.getInstance();
+            String horario = "" + hora.get(Calendar.HOUR_OF_DAY) + ":" + hora.get(Calendar.MINUTE);
+            String sData = "" + hora.get(Calendar.DAY_OF_MONTH) + "/" + (hora.get(Calendar.MONTH)+1)
+                    + "/" + hora.get(Calendar.YEAR);
+            Log.e("HORA: ", horario);
+            Log.e("DATA: ", sData);
+        } else if (resultCode == 2) {
+            mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
+        }
     }
 
     public void onCircleClick(Circle circle) {
         circulo.setFillColor(0x50008000);
-        Log.e( "XWXW", " " + "CLICK CIRCLE");
+        Log.e("XWXW", " " + "CLICK CIRCLE");
     }
 
     @Override
@@ -202,12 +233,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         it = new Intent(this, ActTelaParaMarcar.class);
 
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener()
-        { @Override public void onMapLongClick(LatLng point)
-        {   marcar = true;
-            latLngMarcar = point;
-            it.putExtra("TESTE", "teste aqui"); // trecho apenas para um teste de passagem dos parametros
-            startActivityForResult(it, 0); } }); //chama a outra janela
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
+                marcar = true;
+                latLngMarcar = point;
+                it.putExtra("TESTE", "teste aqui"); // trecho apenas para um teste de passagem dos parametros
+                startActivityForResult(it, 0);
+            }
+        }); //chama a outra janela
 
         /*Bundle bundle = getIntent().getExtras();
 
@@ -233,28 +267,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         /*LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
-            if(inicio){
+            if (inicio) {
                 onConnected(Bundle.EMPTY);
             }
         } else {
             // Show rationale and request permission.
             ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSION_LOCATION);
         }
     }
 
     protected void onStart() {
         mGoogleApiClient.connect();
-        super.onStart();
+        super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
+// See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     protected void onStop() {
         mGoogleApiClient.disconnect();
-        super.onStop();
+        super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
+// See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.disconnect();
     }
 
     @Override
@@ -268,11 +312,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onConnected(Bundle connectionHint) { // passa a posicao inicial
-        Log.e( "EXECUTANDO", " onConnected");
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        Log.e("EXECUTANDO", " onConnected");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED && inicio) {
             inicialLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+                    mGoogleApiClient);
             if (inicialLocation != null) {
                 LatLng lugar = new LatLng(inicialLocation.getLatitude(), inicialLocation.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lugar, 14));
@@ -286,11 +330,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 String cidade = address.get(0).getLocality();
                 String bairro = address.get(0).getSubLocality();
+                String estado = address.get(0).getAdminArea();
 
-                Log.e( "CIDADE", " " + cidade);
-                Log.e( "BAIRRO", " " + bairro);
+                Log.e("CIDADE", " " + cidade);
+                Log.e("BAIRRO", " " + bairro);
+                Log.e("ESTADO", " " + estado);
                 inicio = false;
             }
         }
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Maps Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
     }
 }
