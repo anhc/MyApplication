@@ -1,9 +1,7 @@
 package com.example.antnio.myapplication;
 
-import android.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
@@ -12,9 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
-import  android.view.*;
 import android.content.*;
 
 import com.google.android.gms.appindexing.Action;
@@ -31,17 +27,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SearchView.OnQueryTextListener,
@@ -55,10 +48,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Intent it;
     boolean marcar = false;
     LatLng latLngMarcar;
-    EditText edtProcurar;
     SearchView barraProcurar;
     Circle circulo;
     Calendar hora;
+    NumberFormat formato;
+    Alerta alerta;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -91,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        //hora = Calendar.getInstance();
+        formato = new DecimalFormat("00");
     }
 
     @Override
@@ -122,75 +116,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
 
-                InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
-                        INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-
                 return false;
             }
 
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-
-            InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
-                    INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
 
         return false;
     }
 
-    public void procurarLocal(View view) {
-        edtProcurar = (EditText) findViewById(R.id.edtProcurar);
-        String location = edtProcurar.getText().toString();
-        List<Address> locaisList = null;
-        if (location != null && !location.equals("")) {
-            Geocoder geocoder = new Geocoder(this);
-            try {
-                locaisList = geocoder.getFromLocationName(location, 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Address address;
-            try {
-                address = locaisList.get(0);
-            } catch (IndexOutOfBoundsException e) {
-                Context context = getApplicationContext();
-                CharSequence text = "Local digitado não existe!";
-                int duration = Toast.LENGTH_LONG;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
-                InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
-                        INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-
-                return;
-            }
-
-            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
-
-            InputMethodManager imm = (InputMethodManager) getSystemService( // serve para esconder o teclado
-                    INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+    public void dados(LatLng latLng) {
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> address = null;
+        try {
+            address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        String cidade = "";
+        String bairro = "";
+        String estado = "";
+        try{
+            cidade = address.get(0).getLocality();
+            bairro = address.get(0).getSubLocality();
+            estado = address.get(0).getAdminArea();
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+        Log.e("ESTADO", " " + estado);
+        Log.e("CIDADE", " " + cidade);
+        Log.e("BAIRRO", " " + bairro);
+        String lat = "" + latLng.latitude;
+        Log.e("LATITUDE", lat);
+        String slong = "" + latLng.longitude;
+        Log.e("LONGITUDE", slong);
+
+        hora = Calendar.getInstance();
+        String horario = "" + hora.get(Calendar.YEAR) + "-" + formato.format((hora.get(Calendar.MONTH)+1))
+                + "-" + formato.format(hora.get(Calendar.DAY_OF_MONTH)) + " "
+                + formato.format(hora.get(Calendar.HOUR_OF_DAY)) + ":" + formato.format(hora.get(Calendar.MINUTE)) +
+                ":" +formato.format(hora.get(Calendar.SECOND));
+        Log.e("HORA: ", horario);
+
+        alerta = new Alerta(estado, cidade, bairro, lat, slong, horario);
+
+        Log.e("TIPO ALERTA: ", alerta.toString());
     }
-
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
 
     @Override
     protected void onActivityResult(int requestCode,
@@ -198,10 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == 1) {
-            String lat = ""+latLngMarcar.latitude;
-            Log.e("LATITUDE", lat);
-            String slong = ""+latLngMarcar.longitude;
-            Log.e("LATITUDE", slong);
+            dados(latLngMarcar);
             mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             circulo = mMap.addCircle(new CircleOptions()
@@ -211,13 +180,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .strokeColor(0xff4682B4)
                     .fillColor(0x504682B4)
                     .clickable(true));
-            hora = Calendar.getInstance();
-            String horario = "" + hora.get(Calendar.HOUR_OF_DAY) + ":" + hora.get(Calendar.MINUTE);
-            String sData = "" + hora.get(Calendar.DAY_OF_MONTH) + "/" + (hora.get(Calendar.MONTH)+1)
-                    + "/" + hora.get(Calendar.YEAR);
-            Log.e("HORA: ", horario);
-            Log.e("DATA: ", sData);
         } else if (resultCode == 2) {
+            dados(latLngMarcar);
             mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
         }
     }
@@ -243,30 +207,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }); //chama a outra janela
 
-        /*Bundle bundle = getIntent().getExtras();
-
-        if(bundle != null) {
-            if (bundle.containsKey("MARCAR")) {
-                boolean confirma = bundle.getBoolean("MARCAR");
-                if (bundle.containsKey("Classificacao") && marcar && confirma) {
-                    String tipo = bundle.getString("Classificacao");
-                    mMap.addMarker(new MarkerOptions().position(latLngMarcar).title(tipo));
-                    marcar = false;
-                }
-            }
-        }*/
-
-        /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener()
-        { @Override public void onMapLongClick(LatLng point)
-        { mMap.addMarker(new MarkerOptions().position(point).title("DANGER!!").draggable(true));} });*/
-
-        /*mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener()
-        { @Override public void onMapClick(LatLng point)
-        { mMap.addMarker(new MarkerOptions() .position(point).title("DANGER!!").draggable(true)); } });*/
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
@@ -284,7 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
-// See https://g.co/AppIndexing/AndroidStudio for more information.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -294,7 +234,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
-// See https://g.co/AppIndexing/AndroidStudio for more information.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -312,7 +252,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onConnected(Bundle connectionHint) { // passa a posicao inicial
-        Log.e("EXECUTANDO", " onConnected");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED && inicio) {
             inicialLocation = LocationServices.FusedLocationApi.getLastLocation(
@@ -328,10 +267,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String cidade = address.get(0).getLocality();
-                String bairro = address.get(0).getSubLocality();
-                String estado = address.get(0).getAdminArea();
+                String cidade = "";
+                String bairro = "";
+                String estado = "";
+                try{
+                    cidade = address.get(0).getLocality();
+                    bairro = address.get(0).getSubLocality();
+                    estado = address.get(0).getAdminArea();
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                }
 
+                //enviar para o banco os dados a seguir mais a lat e a long
                 Log.e("CIDADE", " " + cidade);
                 Log.e("BAIRRO", " " + bairro);
                 Log.e("ESTADO", " " + estado);

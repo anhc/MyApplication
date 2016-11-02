@@ -1,34 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
-
-        <EditText
-            android:layout_width="242dp"
-            android:layout_height="match_parent"
-            android:id="@+id/edtProcurar"
-            android:hint="@string/digiteLocal"
-            android:textColorLink="?attr/actionModeSplitBackground"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:textCursorDrawable="@null"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/procurar"
-            android:onClick="procurarLocal" />
-
-    </LinearLayout>
-
-    <fragment
+<fragment
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -51,14 +21,4 @@
             android:textColor="@android:color/black"
             android:background="@android:color/white"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:text="Nada ainda"
-            android:layout_marginBottom="20dp"
-            android:layout_marginRight="20dp"/>
-
     </fragment>
-
-</LinearLayout>
