@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -11,25 +12,32 @@
         android:layout_gravity="center_horizontal"
         />
     <RadioGroup
-        android:layout_width="wrap_content"
+        android:id="@+id/grupo1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <RadioButton
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:id="@+id/bom"
             android:text="@string/bom"
             android:textAppearance="?android:textAppearanceLarge"
             android:onClick="tipoSelecionado"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="20dp"
             />
+
         <RadioButton
-            android:layout_width="wrap_content"
+            android:layout_width="108dp"
             android:layout_height="wrap_content"
             android:id="@+id/ruim"
             android:text="@string/ruim"
             android:textAppearance="?android:textAppearanceLarge"
             android:onClick="tipoSelecionado"
-            />
+            android:layout_gravity="end"
+            android:layout_marginTop="30dp" />
     </RadioGroup>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,6 +45,7 @@
         android:text="@string/ok"
         android:layout_gravity="center_horizontal"
         />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,6 +53,7 @@
         android:text="@string/cancelar"
         android:layout_gravity="center_horizontal"
         />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

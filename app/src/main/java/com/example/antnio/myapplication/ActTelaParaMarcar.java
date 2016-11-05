@@ -10,6 +10,8 @@ public class ActTelaParaMarcar extends AppCompatActivity implements View.OnClick
 
     String classificacao = "vazio";
     private Button btnOk, btnCancelar;
+    //RadioGroup grupo1;
+    //RadioButton bom;
     private TextView teste;
     Intent it;
 
@@ -26,6 +28,17 @@ public class ActTelaParaMarcar extends AppCompatActivity implements View.OnClick
 
         teste = (TextView) findViewById(R.id.teste);
 
+        //grupo1 = (RadioGroup) findViewById(R.id.grupo1);
+
+        //grupo1.setEnabled(false);
+
+        /*for(int i = 0; i < grupo1.getChildCount(); i++) {
+            grupo1.getChildAt(i).setEnabled(false);
+        }*/
+
+        //bom = (RadioButton) findViewById(R.id.bom);
+
+        //bom.setEnabled(false);
 
         }
 
@@ -36,10 +49,14 @@ public class ActTelaParaMarcar extends AppCompatActivity implements View.OnClick
                 if(it!=null && !classificacao.equals("vazio")) {
                     it.putExtra("Classificacao", classificacao);
 
-                    if(classificacao.equals("Bom"))
+                    if(classificacao.equals("Bom")){
                         setResult(1);
-                    else
+                        MapsActivity.tipo = "Tee";
+                    }
+                    else{
                         setResult(2);
+                        MapsActivity.tipo = "TESTANDO NNN STATIC";
+                    }
                     finish();
                 }
                 break;

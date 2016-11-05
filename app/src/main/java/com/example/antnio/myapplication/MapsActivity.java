@@ -2,6 +2,8 @@ package com.example.antnio.myapplication;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
@@ -10,6 +12,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.*;
 import android.content.*;
 
@@ -27,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
 
@@ -53,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Calendar hora;
     NumberFormat formato;
     Alerta alerta;
+    static String tipo;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -171,8 +177,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (resultCode == 1) {
             dados(latLngMarcar);
-            mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM")
+            mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR BOM ").snippet("aw"+"\n"+"aa")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                @Override
+                public View getInfoWindow(Marker arg0) {
+                    return null;
+                }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+
+                    Context context = getApplicationContext(); //or getActivity(), YourActivity.this, etc.
+
+                    LinearLayout info = new LinearLayout(context);
+                    info.setOrientation(LinearLayout.VERTICAL);
+
+                    TextView title = new TextView(context);
+                    title.setTextColor(Color.BLACK);
+                    title.setGravity(Gravity.CENTER);
+                    title.setTypeface(null, Typeface.BOLD);
+                    title.setText(marker.getTitle());
+
+                    TextView snippet = new TextView(context);
+                    snippet.setTextColor(Color.GRAY);
+                    snippet.setText(marker.getSnippet());
+
+                    info.addView(title);
+                    info.addView(snippet);
+
+                    return info;
+                }
+            });
+
             circulo = mMap.addCircle(new CircleOptions()
                     .center(latLngMarcar)
                     .radius(300)
@@ -182,7 +221,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .clickable(true));
         } else if (resultCode == 2) {
             dados(latLngMarcar);
-            mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM"));
+            mMap.addMarker(new MarkerOptions().position(latLngMarcar).title("LUGAR RUIM").snippet(tipo));
         }
     }
 
