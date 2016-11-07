@@ -236,6 +236,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         it = new Intent(this, ActTelaParaMarcar.class);
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                LatLng tt = mMap.getCameraPosition().target;
+                Log.e("LATITUDE E LONG", tt.latitude + ", " + tt.longitude);
+                Float zz = mMap.getCameraPosition().zoom;
+                Log.e("NIVEL DE ZOOM", "" + zz);
+            }});
+
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng point) {
